@@ -48,9 +48,12 @@ async function initialCommit() {
     await writeFile(`${REPO_PATH}/${FILE_NAME}`, "A"); // Start with a single character
     console.log("Staging and committing initial file...");
     await execPromise(`git add ${FILE_NAME}`, { cwd: REPO_PATH });
-    await execPromise(`git commit -m "Initial commit with ${FILE_NAME}"`, {
-      cwd: REPO_PATH,
-    });
+    await execPromise(
+      `git commit -m "Initial commit from render with ${FILE_NAME}"`,
+      {
+        cwd: REPO_PATH,
+      }
+    );
     await execPromise(`git push origin ${BRANCH_NAME}`, { cwd: REPO_PATH });
   } else {
     console.log("Initial commit already done.");
