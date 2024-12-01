@@ -43,7 +43,7 @@ async function initialCommit() {
 // Add a new character to the file, commit, and push after 10 commits
 let dailyCommits = 0;
 async function dailyTask() {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     await appendFile(`${REPO_PATH}/${FILE_NAME}`, "A"); // Add one character
     console.log("Staging and committing changes...");
     console.log("commit number", dailyCommits + 1);
