@@ -1,37 +1,15 @@
 import { exec } from "child_process";
-import express from "express";
 import { writeFile, appendFile } from "fs/promises";
 import { existsSync } from "fs";
 import { promisify } from "util";
-import cron from "node-cron";
-import dotenv from "dotenv";
-
-dotenv.config(); // Load environment variables
-
-const app = express();
-app.get("/", (req, res) => {
-  res.send("Running background task..."); // You can modify the message if needed
-});
-
-// This route will just listen for a request, then immediately exit after sending a response
-app.listen(process.env.PORT, () => {
-  console.log(
-    "Web Service is up (dummy server), listening on port",
-    process.env.PORT
-  );
-});
 
 const execPromise = promisify(exec);
 
 // Environment variables
-const REPO_URL = process.env.REPO_URL; // Remote repo URL
+const REPO_URL = "https://github.com/BhusanDotel/auto_commit.git";
 const REPO_PATH = "./auto-commit-repo"; // Local path to clone the repo
-const AUTHOR_NAME = process.env.AUTHOR_NAME || "Auto Commit Bot";
-const AUTHOR_EMAIL = process.env.AUTHOR_EMAIL || "autocommit@example.com";
-const BRANCH_NAME = process.env.BRANCH_NAME || "main";
+const BRANCH_NAME = "main";
 const FILE_NAME = "auto-file.txt"; // File to be created/modified
-// const CRON_SCHEDULE = "0 0 * * *"; // Run daily at midnight
-const CRON_SCHEDULE = "* * * * *"; // Run daily at midnight
 
 // Initialize the repository (clone if not present)
 async function initializeRepo() {
@@ -41,17 +19,6 @@ async function initializeRepo() {
   } else {
     console.log("Repository already cloned.");
   }
-}
-
-// Configure Git author
-async function configureGit() {
-  console.log("Configuring Git...");
-  await execPromise(`git config --global user.name "${AUTHOR_NAME}"`, {
-    cwd: REPO_PATH,
-  });
-  await execPromise(`git config --global user.email "${AUTHOR_EMAIL}"`, {
-    cwd: REPO_PATH,
-  });
 }
 
 // Create the initial commit with a text file
@@ -77,7 +44,6 @@ async function initialCommit() {
 let dailyCommits = 0;
 async function dailyTask() {
   for (let i = 0; i < 10; i++) {
-    console.log(`Appending to ${FILE_NAME}...`);
     await appendFile(`${REPO_PATH}/${FILE_NAME}`, "A"); // Add one character
     console.log("Staging and committing changes...");
     console.log("commit number", dailyCommits + 1);
@@ -86,7 +52,7 @@ async function dailyTask() {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, "/");
 
     await execPromise(
-      `git commit -m "Daily push from render ${date} #${dailyCommits + 1}"`,
+      `git commit -m "Daily push ${date} #${dailyCommits + 1}"`,
       {
         cwd: REPO_PATH,
       }
@@ -106,16 +72,8 @@ async function dailyTask() {
 async function main() {
   try {
     await initializeRepo();
-    await configureGit();
     await initialCommit();
-
-    console.log("Scheduling daily task...");
-    cron.schedule(CRON_SCHEDULE, async () => {
-      console.log("Running daily task...");
-      await dailyTask();
-    });
-
-    console.log("Script is running...");
+    await dailyTask();
   } catch (err) {
     console.error("Error:", err);
   }
