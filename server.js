@@ -62,7 +62,7 @@ async function dailyTask() {
     dailyCommits++;
   }
 
-  console.log("10 commits done. Pushing changes...");
+  console.log(`${dailyCommits} commits done. Pushing changes...`);
   const res = await execPromise(`git push origin ${BRANCH_NAME}`, {
     cwd: REPO_PATH,
   });
