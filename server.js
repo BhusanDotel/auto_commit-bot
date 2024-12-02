@@ -2,14 +2,16 @@ import { exec } from "child_process";
 import { writeFile, appendFile } from "fs/promises";
 import { existsSync } from "fs";
 import { promisify } from "util";
+import dotenv from "dotenv";
 
 const execPromise = promisify(exec);
 
-// Environment variables
-const REPO_URL = "https://github.com/BhusanDotel/auto_commit.git";
-const REPO_PATH = "./auto-commit-repo"; // Local path to clone the repo
-const BRANCH_NAME = "main";
-const FILE_NAME = "auto-file.txt"; // File to be created/modified
+dotenv.config();
+
+const REPO_URL = process.env.REPO_URL;
+const REPO_PATH = process.env.REPO_PATH;
+const BRANCH_NAME = process.env.BRANCH_NAME;
+const FILE_NAME = process.env.FILE_NAME;
 
 // Initialize the repository (clone if not present)
 async function initializeRepo() {
